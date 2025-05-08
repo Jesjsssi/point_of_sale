@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\HasKoperasiId;
+use App\Traits\HasKoperasiScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,7 +11,7 @@ use Kyslik\ColumnSortable\Sortable;
 
 class Employee extends Model
 {
-    use HasFactory, Sortable;
+    use HasFactory, Sortable, HasKoperasiScope, HasKoperasiId;
 
     protected $fillable = [
         'name',
@@ -21,6 +23,7 @@ class Employee extends Model
         'salary',
         'vacation',
         'city',
+        'koperasi_id',
     ];
 
     public $sortable = [
@@ -45,5 +48,10 @@ class Employee extends Model
     public function advance_salaries()
     {
         return $this->hasMany(AdvanceSalary::class);
+    }
+
+    public function koperasi()
+    {
+        return $this->belongsTo(Koperasi::class);
     }
 }

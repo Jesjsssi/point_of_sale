@@ -27,6 +27,7 @@ class User extends Authenticatable
         'password',
         'photo',
         'email_verified_at',
+        'koperasi_id',
     ];
 
     /**
@@ -91,5 +92,10 @@ class User extends Authenticatable
             }
             return $hasPermission;
         }
+    }
+
+    public function koperasi()
+    {
+        return $this->belongsTo(Koperasi::class);
     }
 }

@@ -27,7 +27,7 @@ class OrderController extends Controller
             abort(400, 'The per-page parameter must be an integer between 1 and 100.');
         }
 
-        $orders = Order::where('order_status', 'pending')->sortable()->paginate($row);
+        $orders = Order::where('order_status', 'pending')->forKoperasi()->sortable()->paginate($row);
 
         return view('orders.pending-orders', [
             'orders' => $orders
@@ -42,7 +42,7 @@ class OrderController extends Controller
             abort(400, 'The per-page parameter must be an integer between 1 and 100.');
         }
 
-        $orders = Order::where('order_status', 'complete')->sortable()->paginate($row);
+        $orders = Order::where('order_status', 'complete')->forKoperasi()->sortable()->paginate($row);
 
         return view('orders.complete-orders', [
             'orders' => $orders
@@ -60,6 +60,7 @@ class OrderController extends Controller
         return view('stock.index', [
             'products' => Product::with(['category', 'supplier'])
                 ->filter(request(['search']))
+                ->forKoperasi()
                 ->sortable()
                 ->paginate($row)
                 ->appends(request()->query()),
@@ -95,6 +96,7 @@ class OrderController extends Controller
         $validatedData['total'] = Cart::total();
         $validatedData['due'] = Cart::total() - $validatedData['pay'];
         $validatedData['created_at'] = Carbon::now();
+        $validatedData['koperasi_id'] = auth()->user()->koperasi_id;
 
         $order_id = Order::insertGetId($validatedData);
 
@@ -109,6 +111,7 @@ class OrderController extends Controller
             $oDetails['unitcost'] = $content->price;
             $oDetails['total'] = $content->total;
             $oDetails['created_at'] = Carbon::now();
+            $oDetails['koperasi_id'] = auth()->user()->koperasi_id;
 
             OrderDetails::insert($oDetails);
         }
@@ -180,6 +183,7 @@ class OrderController extends Controller
         }
 
         $orders = Order::where('due', '>', '0')
+            ->forKoperasi()
             ->sortable()
             ->paginate($row);
 

@@ -16,8 +16,8 @@ use App\Http\Controllers\Dashboard\OrderController;
 use App\Http\Controllers\Dashboard\PosController;
 use App\Http\Controllers\Dashboard\RoleController;
 use App\Http\Controllers\Dashboard\UserController;
-use App\Http\Controllers\FinancialSummaryController;
 use App\Http\Controllers\Dashboard\StockController;
+use App\Http\Controllers\Dashboard\KoperasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +31,7 @@ use App\Http\Controllers\Dashboard\StockController;
 */
 
 Route::get('/', function () {
-    return view('auth.login');
+    return view('welcome');
 });
 
 
@@ -87,9 +87,8 @@ Route::middleware(['permission:product.menu'])->group(function () {
     Route::get('/products/import', [ProductController::class, 'importView'])->name('products.importView');
     Route::post('/products/import', [ProductController::class, 'importStore'])->name('products.importStore');
     Route::get('/products/export', [ProductController::class, 'exportData'])->name('products.exportData');
-    Route::get('/products/barcode/{id}/download', [ProductController::class, 'downloadBarcode'])->name('products.downloadBarcode');
     Route::resource('/products', ProductController::class);
-    
+    Route::get('/products/barcode/{id}/download', [ProductController::class, 'downloadBarcode'])->name('products.downloadBarcode');
 });
 
 // ====== CATEGORY PRODUCTS ======
@@ -99,7 +98,7 @@ Route::middleware(['permission:category.menu'])->group(function () {
 
 // ====== POS ======
 Route::middleware(['permission:pos.menu'])->group(function () {
-    Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+    Route::get('/pos', [PosController::class,'index'])->name('pos.index');
     Route::post('/pos/add', [PosController::class, 'addCart'])->name('pos.addCart');
     Route::post('/pos/update/{rowId}', [PosController::class, 'updateCart'])->name('pos.updateCart');
     Route::get('/pos/delete/{rowId}', [PosController::class, 'deleteCart'])->name('pos.deleteCart');
@@ -164,6 +163,8 @@ Route::middleware(['permission:roles.menu'])->group(function () {
     Route::delete('/role/permission/{id}', [RoleController::class, 'rolePermissionDestroy'])->name('rolePermission.destroy');
 });
 
-Route::get('/financial-summary', [FinancialSummaryController::class, 'index'])->name('financial.summary');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('koperasi', KoperasiController::class)->middleware('permission:koperasi.menu');
+});
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

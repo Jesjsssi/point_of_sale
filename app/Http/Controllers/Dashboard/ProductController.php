@@ -34,6 +34,7 @@ class ProductController extends Controller
 
         return view('products.index', [
             'products' => Product::with(['category', 'supplier'])
+                ->forKoperasi()
                 ->filter(request(['search']))
                 ->sortable()
                 ->paginate($row)
@@ -47,8 +48,8 @@ class ProductController extends Controller
     public function create()
     {
         return view('products.create', [
-            'categories' => Category::all(),
-            'suppliers' => Supplier::all(),
+            'categories' => Category::forKoperasi()->get(),
+            'suppliers' => Supplier::forKoperasi()->get(),
         ]);
     }
 
@@ -78,15 +79,18 @@ class ProductController extends Controller
         ];
 
         $validatedData = $request->validate($rules);
-
-        // save product code value
         $validatedData['product_code'] = $product_code;
+        $validatedData['koperasi_id'] = auth()->user()->koperasi_id;
+
+        // Verify category and supplier belong to user's koperasi
+        $category = Category::forKoperasi()->findOrFail($validatedData['category_id']);
+        $supplier = Supplier::forKoperasi()->findOrFail($validatedData['supplier_id']);
 
         /**
          * Handle upload image with Storage.
          */
         if ($file = $request->file('product_image')) {
-            $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
+            $fileName = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
             $path = 'public/products/';
 
             $file->storeAs($path, $fileName);
@@ -103,6 +107,11 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        // Verify product belongs to user's koperasi
+        if (!$product->koperasi_id == auth()->user()->koperasi_id && !auth()->user()->roles->contains('name', 'superadmin')) {
+            abort(403);
+        }
+
         // Barcode Generator
         $generator = new BarcodeGeneratorHTML();
 
@@ -119,9 +128,14 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
+        // Verify product belongs to user's koperasi
+        if (!$product->koperasi_id == auth()->user()->koperasi_id && !auth()->user()->roles->contains('name', 'superadmin')) {
+            abort(403);
+        }
+
         return view('products.edit', [
-            'categories' => Category::all(),
-            'suppliers' => Supplier::all(),
+            'categories' => Category::forKoperasi()->get(),
+            'suppliers' => Supplier::forKoperasi()->get(),
             'product' => $product
         ]);
     }
@@ -150,13 +164,13 @@ class ProductController extends Controller
          * Handle upload image with Storage.
          */
         if ($file = $request->file('product_image')) {
-            $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
+            $fileName = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
             $path = 'public/products/';
 
             /**
              * Delete photo if exists.
              */
-            if ($product->product_image) {
+            if($product->product_image){
                 Storage::delete($path . $product->product_image);
             }
 
@@ -177,7 +191,7 @@ class ProductController extends Controller
         /**
          * Delete photo if exists.
          */
-        if ($product->product_image) {
+        if($product->product_image){
             Storage::delete('public/products/' . $product->product_image);
         }
 
@@ -202,28 +216,28 @@ class ProductController extends Controller
 
         $the_file = $request->file('upload_file');
 
-        try {
+        try{
             $spreadsheet = IOFactory::load($the_file->getRealPath());
-            $sheet = $spreadsheet->getActiveSheet();
-            $row_limit = $sheet->getHighestDataRow();
+            $sheet        = $spreadsheet->getActiveSheet();
+            $row_limit    = $sheet->getHighestDataRow();
             $column_limit = $sheet->getHighestDataColumn();
-            $row_range = range(2, $row_limit);
-            $column_range = range('J', $column_limit);
+            $row_range    = range( 2, $row_limit );
+            $column_range = range( 'J', $column_limit );
             $startcount = 2;
             $data = array();
-            foreach ($row_range as $row) {
+            foreach ( $row_range as $row ) {
                 $data[] = [
-                    'product_name' => $sheet->getCell('A' . $row)->getValue(),
-                    'category_id' => $sheet->getCell('B' . $row)->getValue(),
-                    'supplier_id' => $sheet->getCell('C' . $row)->getValue(),
-                    'product_code' => $sheet->getCell('D' . $row)->getValue(),
-                    'product_garage' => $sheet->getCell('E' . $row)->getValue(),
-                    'product_image' => $sheet->getCell('F' . $row)->getValue(),
-                    'product_store' => $sheet->getCell('G' . $row)->getValue(),
-                    'buying_date' => $sheet->getCell('H' . $row)->getValue(),
-                    'expire_date' => $sheet->getCell('I' . $row)->getValue(),
-                    'buying_price' => $sheet->getCell('J' . $row)->getValue(),
-                    'selling_price' => $sheet->getCell('K' . $row)->getValue(),
+                    'product_name' => $sheet->getCell( 'A' . $row )->getValue(),
+                    'category_id' => $sheet->getCell( 'B' . $row )->getValue(),
+                    'supplier_id' => $sheet->getCell( 'C' . $row )->getValue(),
+                    'product_code' => $sheet->getCell( 'D' . $row )->getValue(),
+                    'product_garage' => $sheet->getCell( 'E' . $row )->getValue(),
+                    'product_image' => $sheet->getCell( 'F' . $row )->getValue(),
+                    'product_store' =>$sheet->getCell( 'G' . $row )->getValue(),
+                    'buying_date' =>$sheet->getCell( 'H' . $row )->getValue(),
+                    'expire_date' =>$sheet->getCell( 'I' . $row )->getValue(),
+                    'buying_price' =>$sheet->getCell( 'J' . $row )->getValue(),
+                    'selling_price' =>$sheet->getCell( 'K' . $row )->getValue(),
                 ];
                 $startcount++;
             }
@@ -237,8 +251,7 @@ class ProductController extends Controller
         return Redirect::route('products.index')->with('success', 'Data has been successfully imported!');
     }
 
-    public function exportExcel($products)
-    {
+    public function exportExcel($products){
         ini_set('max_execution_time', 0);
         ini_set('memory_limit', '4000M');
 
@@ -262,11 +275,10 @@ class ProductController extends Controller
      *This function loads the customer data from the database then converts it
      * into an Array that will be exported to Excel
      */
-    function exportData()
-    {
+    function exportData(){
         $products = Product::all()->sortByDesc('product_id');
 
-        $product_array[] = array(
+        $product_array [] = array(
             'Product Name',
             'Category Id',
             'Supplier Id',
@@ -280,7 +292,8 @@ class ProductController extends Controller
             'Selling Price',
         );
 
-        foreach ($products as $product) {
+        foreach($products as $product)
+        {
             $product_array[] = array(
                 'Product Name' => $product->product_name,
                 'Category Id' => $product->category_id,
@@ -288,11 +301,11 @@ class ProductController extends Controller
                 'Product Code' => $product->product_code,
                 'Product Garage' => $product->product_garage,
                 'Product Image' => $product->product_image,
-                'Product Store' => $product->product_store,
-                'Buying Date' => $product->buying_date,
-                'Expire Date' => $product->expire_date,
-                'Buying Price' => $product->buying_price,
-                'Selling Price' => $product->selling_price,
+                'Product Store' =>$product->product_store,
+                'Buying Date' =>$product->buying_date,
+                'Expire Date' =>$product->expire_date,
+                'Buying Price' =>$product->buying_price,
+                'Selling Price' =>$product->selling_price,
             );
         }
 
@@ -303,14 +316,14 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $generator = new BarcodeGeneratorPNG();
-
+        
         $barcode = $generator->getBarcode($product->product_code, $generator::TYPE_CODE_128);
-
+        
         $headers = [
             'Content-Type' => 'image/png',
             'Content-Disposition' => 'attachment; filename="' . $product->product_code . '_barcode.png"',
         ];
-
+        
         return response($barcode)->withHeaders($headers);
     }
 }

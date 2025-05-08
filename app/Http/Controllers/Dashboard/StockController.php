@@ -40,4 +40,4 @@ class StockController extends Controller
 
         return Redirect::route('order.stockManage')->with('success', 'Stock berhasil diupdate!');
     }
-}
+} 

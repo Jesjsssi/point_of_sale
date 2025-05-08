@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\HasKoperasiId;
+use App\Traits\HasKoperasiScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Kyslik\ColumnSortable\Sortable;
 
 class Attendence extends Model
 {
-    use HasFactory, Sortable;
+    use HasFactory, Sortable, HasKoperasiScope, HasKoperasiId;
 
     protected $fillable = [
         'employee_id',
         'date',
         'status',
+        'koperasi_id',
     ];
 
     public $sortable = [
@@ -37,5 +40,10 @@ class Attendence extends Model
     public function getRouteKeyName()
     {
         return 'date';
+    }
+
+    public function koperasi()
+    {
+        return $this->belongsTo(Koperasi::class);
     }
 }

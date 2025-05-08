@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\HasKoperasiId;
+use App\Traits\HasKoperasiScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Kyslik\ColumnSortable\Sortable;
 
 class AdvanceSalary extends Model
 {
-    use HasFactory, Sortable;
+    use HasFactory, Sortable, HasKoperasiScope, HasKoperasiId;
 
     protected $fillable = [
         'employee_id',
         'date',
         'advance_salary',
+        'koperasi_id',
     ];
 
     public $sortable = [
@@ -39,5 +42,10 @@ class AdvanceSalary extends Model
                 $query->where('name', 'like', '%' . $search . '%');
             });
         });
+    }
+
+    public function koperasi()
+    {
+        return $this->belongsTo(Koperasi::class);
     }
 }

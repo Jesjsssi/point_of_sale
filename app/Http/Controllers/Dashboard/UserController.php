@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Models\User;
+use App\Models\Koperasi;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
@@ -24,8 +25,15 @@ class UserController extends Controller
             abort(400, 'The per-page parameter must be an integer between 1 and 100.');
         }
 
+        $query = User::with('koperasi')->filter(request(['search']));
+        
+        // Filter by koperasi_id except for superadmin
+        if (!auth()->user()->roles->contains('name', 'superadmin')) {
+            $query->where('koperasi_id', auth()->user()->koperasi_id);
+        }
+
         return view('users.index', [
-            'users' => User::filter(request(['search']))->sortable()->paginate($row)->appends(request()->query()),
+            'users' => $query->sortable()->paginate($row)->appends(request()->query()),
         ]);
     }
 
@@ -36,6 +44,7 @@ class UserController extends Controller
     {
         return view('users.create', [
             'roles' => Role::all(),
+            'koperasi' => Koperasi::all(),
         ]);
     }
 
@@ -51,6 +60,7 @@ class UserController extends Controller
             'username' => 'required|min:4|max:25|alpha_dash:ascii|unique:users,username',
             'password' => 'min:6|required_with:password_confirmation',
             'password_confirmation' => 'min:6|same:password',
+            'koperasi_id' => 'required|exists:koperasi,id',
         ];
 
         $validatedData = $request->validate($rules);
@@ -92,6 +102,7 @@ class UserController extends Controller
         return view('users.edit', [
             'userData' => $user,
             'roles' => Role::all(),
+            'koperasi' => Koperasi::all(),
         ]);
     }
 
@@ -105,6 +116,7 @@ class UserController extends Controller
             'photo' => 'image|file|max:1024',
             'email' => 'required|email|max:50|unique:users,email,'.$user->id,
             'username' => 'required|min:4|max:25|alpha_dash:ascii|unique:users,username,'.$user->id,
+            'koperasi_id' => 'required|exists:koperasi,id',
         ];
 
         if($request->password || $request->confirm_password) {
@@ -113,7 +125,10 @@ class UserController extends Controller
         }
 
         $validatedData = $request->validate($rules);
+        
+        if($request->password) {
         $validatedData['password'] = Hash::make($request->password);
+        }
 
         /**
          * Handle upload image with Storage.

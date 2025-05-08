@@ -1,8 +1,8 @@
+
 <div class="iq-sidebar sidebar-default ">
     <div class="iq-sidebar-logo d-flex align-items-center justify-content-between">
         <a href="{{ route('dashboard') }}" class="header-logo">
-            <img src="{{ asset('assets/images/logo.png') }}" class="img-fluid rounded-normal light-logo" alt="logo">
-            <h5 class="logo-title light-logo ml-3">POSDash</h5>
+            <img src="{{ asset('assets/images/logo.png') }}" class="img-fluid rounded-normal light-logo" alt="logo"><h5 class="logo-title light-logo ml-3">POSDash</h5>
         </a>
         <div class="iq-menu-bt-sidebar ml-0">
             <i class="las la-bars wrapper-menu"></i>
@@ -27,12 +27,12 @@
                 </li>
 
                 @if (auth()->user()->can('pos.menu'))
-                    <li class="{{ Request::is('pos*') ? 'active' : '' }}">
-                        <a href="{{ route('pos.index') }}" class="svg-icon">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                            <span class="ml-3">POS</span>
-                        </a>
-                    </li>
+                <li class="{{ Request::is('pos*') ? 'active' : '' }}">
+                    <a href="{{ route('pos.index') }}" class="svg-icon">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="ml-3">POS</span>
+                    </a>
+                </li>
                 @endif
 
                 <hr>
@@ -215,55 +215,61 @@
 
 
                 @if (auth()->user()->can('roles.menu'))
-                    <li>
-                        <a href="#permission" class="collapsed" data-toggle="collapse" aria-expanded="false">
-                            <i class="fa-solid fa-key"></i>
-                            <span class="ml-3">Role & Izin</span>
-                            <svg class="svg-icon iq-arrow-right arrow-active" width="20" height="20"
-                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="10 15 15 20 20 15"></polyline>
-                                <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>
-                            </svg>
-                        </a>
-                        <ul id="permission" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle" style="">
-                            <li
-                                class="{{ Request::is(['permission', 'permission/create', 'permission/edit/*']) ? 'active' : '' }}">
-                                <a href="{{ route('permission.index') }}">
-                                    <i class="fa-solid fa-arrow-right"></i><span>Izin</span>
-                                </a>
-                            </li>
-                            <li class="{{ Request::is(['role', 'role/create', 'role/edit/*']) ? 'active' : '' }}">
-                                <a href="{{ route('role.index') }}">
-                                    <i class="fa-solid fa-arrow-right"></i><span>Role</span>
-                                </a>
-                            </li>
-                            <li class="{{ Request::is(['role/permission*']) ? 'active' : '' }}">
-                                <a href="{{ route('rolePermission.index') }}">
-                                    <i class="fa-solid fa-arrow-right"></i><span>Role & Izin</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                <li>
+                    <a href="#permission" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                        <i class="fa-solid fa-key"></i>
+                        <span class="ml-3">Role & Permission</span>
+                        <svg class="svg-icon iq-arrow-right arrow-active" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="10 15 15 20 20 15"></polyline><path d="M4 4h7a4 4 0 0 1 4 4v12"></path>
+                        </svg>
+                    </a>
+                    <ul id="permission" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle" style="">
+                        <li class="{{ Request::is(['permission', 'permission/create', 'permission/edit/*']) ? 'active' : '' }}">
+                            <a href="{{ route('permission.index') }}">
+                                <i class="fa-solid fa-arrow-right"></i><span>Permissions</span>
+                            </a>
+                        </li>
+                        <li class="{{ Request::is(['role', 'role/create', 'role/edit/*']) ? 'active' : '' }}">
+                            <a href="{{ route('role.index') }}">
+                                <i class="fa-solid fa-arrow-right"></i><span>Roles</span>
+                            </a>
+                        </li>
+                        <li class="{{ Request::is(['role/permission*']) ? 'active' : '' }}">
+                            <a href="{{ route('rolePermission.index') }}">
+                                <i class="fa-solid fa-arrow-right"></i><span>Role in Permissions</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 @endif
 
                 @if (auth()->user()->can('user.menu'))
-                    <li class="{{ Request::is('users*') ? 'active' : '' }}">
-                        <a href="{{ route('users.index') }}" class="svg-icon">
-                            <i class="fa-solid fa-users"></i>
-                            <span class="ml-3">Pengguna</span>
-                        </a>
-                    </li>
+                <li class="{{ Request::is('users*') ? 'active' : '' }}">
+                    <a href="{{ route('users.index') }}" class="svg-icon">
+                        <i class="fa-solid fa-users"></i>
+                        <span class="ml-3">Users</span>
+                    </a>
+                </li>
                 @endif
 
                 @if (auth()->user()->can('database.menu'))
-                    <!-- <li class="{{ Request::is('database/backup*') ? 'active' : '' }}">
-                        <a href="{{ route('backup.index') }}" class="svg-icon">
-                            <i class="fa-solid fa-database"></i>
-                            <span class="ml-3">Backup Database</span>
-                        </a>
-                    </li> -->
+                <li class="{{ Request::is('database/backup*') ? 'active' : '' }}">
+                    <a href="{{ route('backup.index') }}" class="svg-icon">
+                        <i class="fa-solid fa-database"></i>
+                        <span class="ml-3">Backup Database</span>
+                    </a>
+                </li>
                 @endif
+
+                @if (auth()->user()->can('koperasi.menu'))
+                <li class="{{ Request::is('koperasi*') ? 'active' : '' }}">
+                    <a href="{{ route('koperasi.index') }}" class="svg-icon">
+                        <i class="fa-solid fa-building"></i>
+                        <span class="ml-3">Koperasi</span>
+                    </a>
+                </li>
+                @endif
+
             </ul>
         </nav>
         <div class="p-3"></div>

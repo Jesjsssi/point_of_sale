@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
+use App\Traits\HasKoperasiId;
+use App\Traits\HasKoperasiScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Kyslik\ColumnSortable\Sortable;
 
 class Category extends Model
 {
-    use HasFactory, Sortable;
+    use HasFactory, Sortable, HasKoperasiScope, HasKoperasiId;
 
     protected $fillable = [
         'name',
         'slug',
+        'koperasi_id',
     ];
 
     protected $sortable = [
@@ -38,5 +41,10 @@ class Category extends Model
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+
+    public function koperasi()
+    {
+        return $this->belongsTo(Koperasi::class);
     }
 }

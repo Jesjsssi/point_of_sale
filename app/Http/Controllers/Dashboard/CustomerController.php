@@ -9,6 +9,7 @@ use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 
+
 class CustomerController extends Controller
 {
     /**
@@ -23,7 +24,11 @@ class CustomerController extends Controller
         }
 
         return view('customers.index', [
-            'customers' => Customer::filter(request(['search']))->sortable()->paginate($row)->appends(request()->query()),
+            'customers' => Customer::forKoperasi()
+                ->filter(request(['search']))
+                ->sortable()
+                ->paginate($row)
+                ->appends(request()->query()),
         ]);
     }
 
@@ -55,6 +60,7 @@ class CustomerController extends Controller
         ];
 
         $validatedData = $request->validate($rules);
+        $validatedData['koperasi_id'] = auth()->user()->koperasi_id;
 
         /**
          * Handle upload image with Storage.
@@ -77,6 +83,11 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
+        // Verify customer belongs to user's koperasi
+        if (!$customer->koperasi_id == auth()->user()->koperasi_id && !auth()->user()->roles->contains('name', 'superadmin')) {
+            abort(403);
+        }
+
         return view('customers.show', [
             'customer' => $customer,
         ]);
@@ -87,6 +98,11 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
+        // Verify customer belongs to user's koperasi
+        if (!$customer->koperasi_id == auth()->user()->koperasi_id && !auth()->user()->roles->contains('name', 'superadmin')) {
+            abort(403);
+        }
+
         return view('customers.edit', [
             'customer' => $customer
         ]);
@@ -97,6 +113,11 @@ class CustomerController extends Controller
      */
     public function update(Request $request, Customer $customer)
     {
+        // Verify customer belongs to user's koperasi
+        if (!$customer->koperasi_id == auth()->user()->koperasi_id && !auth()->user()->roles->contains('name', 'superadmin')) {
+            abort(403);
+        }
+
         $rules = [
             'photo' => 'image|file|max:1024',
             'name' => 'required|string|max:50',
@@ -141,6 +162,11 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
+        // Verify customer belongs to user's koperasi
+        if (!$customer->koperasi_id == auth()->user()->koperasi_id && !auth()->user()->roles->contains('name', 'superadmin')) {
+            abort(403);
+        }
+
         /**
          * Delete photo if exists.
          */

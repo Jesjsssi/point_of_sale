@@ -29,7 +29,7 @@
                             <div class="input-group mb-4 col-lg-6">
                                 <div class="custom-file">
                                     <input type="file" class="custom-file-input @error('photo') is-invalid @enderror" id="image" name="photo" accept="image/*" onchange="previewImage();">
-                                    <label class="custom-file-label" for="photo">Choose file</label>
+                                    <label class="custom-file-label" for="image">Choose file</label>
                                 </div>
                                 @error('photo')
                                 <div class="invalid-feedback">
@@ -68,10 +68,9 @@
                                 </div>
                                 @enderror
                             </div>
-
                             <div class="form-group col-md-6">
                                 <label for="password">Password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required  autocomplete="off">
+                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
                                 @error('password')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -88,14 +87,28 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="role">Role</label>
-                                <select class="form-control @error('role') is-invalid @enderror" name="role">
-                                    <option selected="" disabled>-- Select Role --</option>
+                                <label for="role">Role <span class="text-danger">*</span></label>
+                                <select class="form-control @error('role') is-invalid @enderror" name="role" required>
+                                    <option selected="" disabled="">Select Role</option>
                                     @foreach ($roles as $role)
-                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                        <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>{{ $role->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('role')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="koperasi_id">Koperasi <span class="text-danger">*</span></label>
+                                <select class="form-control @error('koperasi_id') is-invalid @enderror" name="koperasi_id" required>
+                                    <option selected="" disabled="">Select Koperasi</option>
+                                    @foreach ($koperasi as $item)
+                                        <option value="{{ $item->id }}" {{ old('koperasi_id') == $item->id ? 'selected' : '' }}>{{ $item->nama_koperasi }}</option>
+                                    @endforeach
+                                </select>
+                                @error('koperasi_id')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -117,3 +130,17 @@
 
 @include('components.preview-img-form')
 @endsection
+
+@push('scripts')
+    <script>
+        function previewImage() {
+            const image = document.querySelector('#image');
+            const imgPreview = document.querySelector('#image-preview');
+            const oFReader = new FileReader();
+            oFReader.readAsDataURL(image.files[0]);
+            oFReader.onload = function(oFREvent) {
+                imgPreview.src = oFREvent.target.result;
+            }
+        }
+    </script>
+@endpush

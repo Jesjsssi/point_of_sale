@@ -63,6 +63,7 @@
                             <th>@sortablelink('name')</th>
                             <th>@sortablelink('username')</th>
                             <th>@sortablelink('email')</th>
+                            <th>Koperasi</th>
                             <th>Role</th>
                             <th>Action</th>
                         </tr>
@@ -77,34 +78,33 @@
                             <td>{{ $item->name }}</td>
                             <td>{{ $item->username }}</td>
                             <td>{{ $item->email }}</td>
+                            <td>{{ $item->koperasi->nama_koperasi ?? '-' }}</td>
                             <td>
                                 @foreach ($item->roles as $role)
-                                    <span class="badge bg-danger">{{ $role->name }}</span>
+                                    <span class="badge bg-primary">{{ $role->name }}</span>
                                 @endforeach
                             </td>
                             <td>
-                                <form action="{{ route('users.destroy', $item->username) }}" method="POST" style="margin-bottom: 5px">
+                                <div class="d-flex align-items-center list-action">
+                                    @can('user.edit')
+                                    <a class="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="Edit"
+                                        data-original-title="Edit" href="{{ route('users.edit', $item->username) }}"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    @endcan
+
+                                    @can('user.delete')
+                                    <form action="{{ route('users.destroy', $item->username) }}" method="POST" style="margin-bottom: 0px">
                                     @method('delete')
                                     @csrf
-                                    <div class="d-flex align-items-center list-action">
-                                        {{-- <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                            href="{{ route('users.show', $item->username) }}"><i class="ri-eye-line mr-0"></i>
-                                        </a> --}}
-                                        <a class="btn btn-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit" href="{{ route('users.edit', $item->username) }}"><i class="ri-pencil-line mr-0"></i>
-                                        </a>
-                                        <button type="submit" class="btn btn-warning mr-2 border-none" onclick="return confirm('Are you sure you want to delete this record?')" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="ri-delete-bin-line mr-0"></i></button>
+                                        <button type="submit" class="badge bg-danger border-0" onclick="return confirm('Are you sure you want to delete this record?')" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                    @endcan
                                     </div>
-                                </form>
                             </td>
                         </tr>
-
                         @empty
-                        <div class="alert text-white bg-danger" role="alert">
-                            <div class="iq-alert-text">Data not Found.</div>
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <i class="ri-close-line"></i>
-                            </button>
-                        </div>
+                        <tr>
+                            <td colspan="8" class="text-center">No data available</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>

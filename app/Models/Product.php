@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\HasKoperasiId;
+use App\Traits\HasKoperasiScope;
 use Kyslik\ColumnSortable\Sortable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
-    use HasFactory, Sortable;
+    use HasFactory, Sortable, HasKoperasiScope, HasKoperasiId;
 
     protected $fillable = [
         'product_name',
@@ -22,6 +24,7 @@ class Product extends Model
         'expire_date',
         'buying_price',
         'selling_price',
+        'koperasi_id',
     ];
 
     public $sortable = [
@@ -51,5 +54,10 @@ class Product extends Model
         $query->when($filters['search'] ?? false, function ($query, $search) {
             return $query->where('product_name', 'like', '%' . $search . '%');
         });
+    }
+
+    public function koperasi()
+    {
+        return $this->belongsTo(Koperasi::class);
     }
 }
