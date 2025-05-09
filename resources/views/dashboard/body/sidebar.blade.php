@@ -81,15 +81,6 @@
                     </li>
                 @endif
 
-                @if (auth()->user()->can('orders.menu'))
-                    <li class="{{ Request::is('financial-summary*') ? 'active' : '' }}">
-                        <a href="{{ route('financial.summary') }}" class="svg-icon">
-                            <i class="fa-solid fa-chart-line"></i>
-                            <span class="ml-3">Ringkasan Keuangan</span>
-                        </a>
-                    </li>
-                @endif
-
                 @if (auth()->user()->can('product.menu'))
                     <li>
                         <a href="#products" class="collapsed" data-toggle="collapse" aria-expanded="false">
