@@ -118,8 +118,8 @@ class OrderController extends Controller
 
         // Delete Cart Sopping History
         Cart::destroy();
-
-        return Redirect::route('dashboard')->with('success', 'Order has been created!');
+        
+        return Redirect::route('order.orderDetails', $order_id)->with('success', 'Order has been created!');
     }
 
     /**

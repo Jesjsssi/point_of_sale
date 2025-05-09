@@ -31,7 +31,7 @@ use App\Http\Controllers\Dashboard\KoperasiController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 

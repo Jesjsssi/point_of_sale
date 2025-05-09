@@ -155,7 +155,7 @@
                                             <input type="hidden" name="name" value="{{ $product->product_name }}">
                                             <input type="hidden" name="price" value="{{ $product->selling_price }}">
 
-                                            <button type="submit" class="btn btn-primary border-none" data-toggle="tooltip" data-placement="top" title="" data-original-title="Add"><i class="far fa-plus mr-0"></i></button>
+                                            <button type="submit" class="btn btn-primary border-none" data-toggle="tooltip" data-placement="top" title="" data-original-title="Add"><i class="far fa-plus mr-0"></i>Tambah</button>
                                         </form>
                                     </td>
                                 </tr>
