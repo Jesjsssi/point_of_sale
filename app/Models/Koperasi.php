@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Kyslik\ColumnSortable\Sortable;
 
 class Koperasi extends Model
 {
-    use HasFactory;
+    use HasFactory, Sortable;
 
     protected $table = 'koperasi';
     
@@ -17,6 +18,22 @@ class Koperasi extends Model
         'telepon',
         'email',
     ];
+
+    public $sortable = [
+        'nama_koperasi',
+        'alamat',
+        'telepon',
+        'email',
+    ];
+
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('nama_koperasi', 'like', '%' . $search . '%')
+                        ->orWhere('alamat', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+        });
+    }
 
     public function users()
     {
